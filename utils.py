@@ -22,3 +22,4 @@ def get_new_headers_or_continue(url, next_data='month'):
         return False
     else:
         print('Not valid input')
+        return True

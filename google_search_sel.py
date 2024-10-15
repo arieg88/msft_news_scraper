@@ -7,10 +7,11 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.action_chains import ActionChains
 from bs4 import BeautifulSoup
 from utils import *  # Assuming read_headers is defined in utils
+import os
 
 # Set up Chrome options for headless browsing (optional)
 chrome_options = Options()
-chrome_options.add_argument("--no-sandbox")
+# chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 
 # Initialize the WebDriver
@@ -34,9 +35,12 @@ def get_urls(soup):
     return urls
 
 # Define search queries
-queries = [(f"intitle:microsoft+site:finance.yahoo.com+after:2024/{month:02d}/01+before:2024/{month+1:02d}/01", month) for month in range(10, 11)]
-monthly_dict = {}
+year = 2023
+queries = [(f"intitle:microsoft+site:finance.yahoo.com+after:{year:04d}/{month:02d}/01+before:{year:04d}/{month+1:02d}/01", month) for month in range(1, 12)]
+queries.append((f"intitle:microsoft+site:finance.yahoo.com+after:{year:04d}/12/01+before:{(year+1):04d}/01/01", 12))
 
+monthly_dict = {}
+# x = True
 for query, month in queries:
     print(f'Searching for month: {month}')
     url = 'https://www.google.com/search?q=' + query
@@ -47,9 +51,12 @@ for query, month in queries:
     while True:
         if start > 0:
             url = f'https://www.google.com/search?q={query}&start={start}'
-        
+
         # Open the URL with Selenium
         driver.get(url)
+        # if x:
+        #     time.sleep(60)
+        #     x = False
         random_sleep()
 
         # Get the page source and parse it with BeautifulSoup
@@ -69,6 +76,7 @@ for query, month in queries:
         if urls_len == len(urls):  
             if get_new_headers_or_continue(url):
                 headers, cookies = read_headers()
+                continue
             else:
                 print(f'Done with {month} (moving to next month)')
                 break
@@ -79,13 +87,11 @@ for query, month in queries:
 
     monthly_dict[month] = urls
 
+    # Ensure the year directory exists
+    os.makedirs(f'./urls/{year}', exist_ok=True)
     # Save results for the month
-    with open(f'{month}_urls.txt', 'w') as file:
+    with open(f'./urls/{year}/{month}_urls.txt', 'w') as file:
         file.write(str(urls))
-
-# Save all results
-with open('all_urls_dict.txt', 'w') as file:
-    file.write(str(monthly_dict))
 
 # Close the WebDriver
 driver.quit()
