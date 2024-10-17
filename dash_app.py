@@ -153,7 +153,7 @@ def update_finbert_graph(selected_month):
         return figure
     return {}
 
-# Emotions Page (similar to VADER and FinBERT)
+# Emotions Page (updated to use a scatter plot)
 def emotions_page():
     return html.Div([
         html.H1("Emotions Analysis"),
@@ -165,6 +165,7 @@ def emotions_page():
         ),
         dcc.Graph(id='emotions-graph'),
     ])
+
 
 @app.callback(
     Output('emotions-graph', 'figure'),
@@ -178,12 +179,51 @@ def update_emotions_graph(selected_month):
                              'emotions_trust', 'emotions_fear', 'emotions_anticipation', 
                              'emotions_disgust', 'emotions_joy', 'emotions_surprise', 
                              'emotions_anger']].mean()
+        
+        # Sort the means for better visualization
+        means = means.sort_values(ascending=False)
+        
+        # Define color mapping for each emotion
+        color_map = {
+            'emotions_sadness': 'blue',
+            'emotions_negative': 'grey',
+            'emotions_positive': 'green',
+            'emotions_trust': 'teal',
+            'emotions_fear': 'purple',
+            'emotions_anticipation': 'orange',
+            'emotions_disgust': 'brown',
+            'emotions_joy': 'yellow',
+            'emotions_surprise': 'pink',
+            'emotions_anger': 'red'
+        }
+
+        # Create scatter plot
         figure = {
-            'data': [{'x': means.index, 'y': means.values, 'type': 'bar', 'name': 'Emotions'}],
-            'layout': {'title': 'Mean Emotion Scores'}
+            'data': [{
+                'x': means.index,
+                'y': [0] * len(means),  # All points on the same y-axis (horizontal alignment)
+                'mode': 'markers',
+                'marker': {
+                    'size': means.values * 30,  # Adjust size based on value (smaller dots)
+                    'color': [color_map[emotion] for emotion in means.index],
+                    'sizemode': 'diameter',
+                    'line': {'width': 2, 'color': 'black'}
+                },
+                'text': [f"{emotion}: {value:.2f}" for emotion, value in means.items()],
+                'hoverinfo': 'text',
+            }],
+            'layout': {
+                'title': 'Emotion Scores (Scaled by Value)',
+                'xaxis': {'title': 'Emotions'},
+                'yaxis': {'visible': False},  # Hide the y-axis since we're only using it for alignment
+                'height': 500,
+                'margin': {'l': 50, 'r': 50, 't': 50, 'b': 100},
+                'plot_bgcolor': 'white'
+            }
         }
         return figure
     return {}
+
 
 # Page Content Routing
 @app.callback(
