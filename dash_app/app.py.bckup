@@ -1,0 +1,139 @@
+import dash
+import dash_bootstrap_components as dbc
+from dash import html
+
+# Include Font Awesome and Bootstrap in external stylesheets
+external_stylesheets = [
+    dbc.themes.BOOTSTRAP,
+    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
+]
+
+# Create the Dash app instance
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+
+# Navbar Component
+PROJECT_LOGO = "./assets/logo.png"
+
+navbar = dbc.Navbar(
+    children=[
+        html.A(
+            dbc.Row(
+                [
+                    dbc.Col(html.Img(src=PROJECT_LOGO, height="80px")),
+                    dbc.Col(
+                        dbc.NavbarBrand("Bank Customer Complaints", className="ml-2")
+                    ),
+                ],
+                align="center",
+            ),
+            href="https://github.com/plotly/dash-sample-apps/tree/main/apps/dash-bank-complaints",
+        ),
+        dbc.Nav(
+            [
+                dbc.NavLink("Homepage", href="/", active="exact"),
+                dbc.NavLink("Article Analysis", href="/article-analysis", active="exact"),
+                dbc.NavLink("AI Analysis", href="/ai-analysis", active="exact"),
+                dbc.NavLink("About Me", href="/about", active="exact"),
+            ],
+            vertical=True,  # Makes the navbar vertical
+            pills=True,     # Optional: adds pill styling to the links
+        )
+    ],
+    color="dark",
+    dark=True,
+    style={"height": "100vh"},  # Make navbar take full height
+)
+
+# Function to create a single card
+def create_card(card_number):
+    return dbc.Card(
+        [
+            dbc.CardHeader(html.H5(f"Topic Modelling using LDA - Card {card_number}")),
+            dbc.Alert(
+                "Not enough data to render LDA plots, please adjust the filters",
+                id=f"no-data-alert-lda-{card_number}",
+                color="warning",
+                style={"display": "none"},
+            ),
+            dbc.CardBody(
+                [
+                    html.P(
+                        "Click on a complaint point in the scatter to explore that specific complaint",
+                        className="mb-0",
+                    ),
+                    html.P(
+                        "(not affected by sample size or time frame selection)",
+                        style={"fontSize": 10, "font-weight": "lighter"},
+                    ),
+                    html.Div("LDA Plot Placeholder", id=f"LDA_PLOT_{card_number}"),
+                    html.Hr(),
+                    html.Div("LDA Table Placeholder", id=f"LDA_TABLE_{card_number}"),
+                ]
+            ),
+        ],
+        className="mb-4",
+    )
+
+# App layout
+app.layout = html.Div(
+    style={"display": "flex", "height": "100vh"},  # Use flexbox for layout
+    children=[
+        dbc.Col(
+            navbar,
+            width=2,  # Adjust this width as necessary for the navbar
+            style={"padding": 0},  # Remove padding to align the navbar correctly
+        ),
+        dbc.Col(
+            dbc.Container(
+                [
+                    dbc.Row(
+                        dbc.Col(
+                            id="cards-container",
+                            children=[create_card(1)],  # Initial card
+                        )
+                    ),
+                    dbc.Row(
+                        dbc.Col(
+                            html.Div(
+                                [
+                                    html.I(className="fas fa-plus", style={"fontSize": "30px"}),  # Correct FontAwesome icon
+                                ],
+                                id="add-card-icon",
+                                className="text-center",
+                                style={"cursor": "pointer", "marginTop": "20px"},
+                            ),
+                            width={"size": 2, "offset": 5},  # Center the plus icon
+                        ),
+                    ),
+                ],
+                style={"marginTop": "20px"},
+            ),
+            width=10,
+            style={"marginLeft": "0"},  # Align the content properly next to the navbar
+        ),
+    ]
+)
+
+# Callback to dynamically add up to 5 cards and hide plus icon after 5 cards
+@app.callback(
+    [dash.Output("cards-container", "children"),
+     dash.Output("add-card-icon", "style")],
+    dash.Input("add-card-icon", "n_clicks"),
+    dash.State("cards-container", "children"),
+)
+def add_card(n_clicks, existing_cards):
+    if n_clicks is None:
+        return existing_cards, {"display": "block"}
+    
+    num_cards = len(existing_cards) + 1
+    if num_cards <= 5:  # Limit to 5 cards
+        existing_cards.append(create_card(num_cards))
+    
+    # Hide the plus icon if 5 or more cards
+    plus_icon_style = {"display": "block"} if num_cards < 5 else {"display": "none"}
+    
+    return existing_cards, plus_icon_style
+
+# Run the server
+if __name__ == "__main__":
+    app.run_server(debug=True)

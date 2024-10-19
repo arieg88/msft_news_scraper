@@ -1,0 +1,16 @@
+{
+    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+    'accept-language': 'en-US,en;q=0.9,he;q=0.8',
+    # 'cookie': 'GUC=AQABCAFm9b1nJ0IfSAS8&s=AQAAAMHLHPQw&g=ZvR4Dw; A1=d=AQABBHf552YCEMzV-mCa1CRIPYzMKSNCU4YFEgABCAG99WYnZ15Ub2UBAiAAAAcId_nnZiNCU4Y&S=AQAAArgM9l1ctpeamjZjRXx9Aek; A1S=d=AQABBHf552YCEMzV-mCa1CRIPYzMKSNCU4YFEgABCAG99WYnZ15Ub2UBAiAAAAcId_nnZiNCU4Y&S=AQAAArgM9l1ctpeamjZjRXx9Aek; A3=d=AQABBHf552YCEMzV-mCa1CRIPYzMKSNCU4YFEgABCAG99WYnZ15Ub2UBAiAAAAcId_nnZiNCU4Y&S=AQAAArgM9l1ctpeamjZjRXx9Aek; PRF=t%3DMSFT; cmp=t=1729284077&j=1&u=1---&v=48; EuConsent=CQFgTkAQFgTkAAOACKHEBLFgAAAAAAAAACiQAAAAAAAA',
+    'priority': 'u=0, i',
+    'referer': 'https://www.google.com/',
+    'sec-ch-ua': '"Google Chrome";v="129", "Not=A?Brand";v="8", "Chromium";v="129"',
+    'sec-ch-ua-mobile': '?0',
+    'sec-ch-ua-platform': '"Windows"',
+    'sec-fetch-dest': 'document',
+    'sec-fetch-mode': 'navigate',
+    'sec-fetch-site': 'cross-site',
+    'sec-fetch-user': '?1',
+    'upgrade-insecure-requests': '1',
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
+}
