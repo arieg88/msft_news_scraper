@@ -21,15 +21,18 @@ driver = webdriver.Chrome(options=chrome_options)
 # Read headers and cookies
 headers, cookies = read_headers()
 
-def get_urls(soup):
+# site_url = 'https://finance.yahoo.com/'
+site_url = 'https://www.ft.com/'
+
+def get_urls(soup, ext=''):
     urls = []
     for link in soup.find_all('a'):
         try:
-            href = link.get('href')  # Get the href attribute safely
-            if href and 'https://finance.yahoo.com/' in href:
-                url = href[href.find('https://finance.yahoo.com/'):href.find('.html') + 5]
-                if url != '' and url != 'http':
-                    urls.append(url)
+            url = link.get('href')  # Get the href attribute safely
+            if url and site_url in url:
+                # url = href[href.find(site_url):href.find(ext) + len(ext)]
+                # if url != '' and url != 'http':
+                urls.append(url)
         except Exception as e:
             print(f"Error parsing link: {e}")
     return urls
@@ -42,7 +45,7 @@ def get_queries(company, site, year):
     return queries
 
 
-def get_monthly_dict(queries, company, year):
+def get_monthly_dict(queries, company, year, site_name):
     monthly_dict = {}
     for query, month in queries:
         print(f'Searching for month: {month}')
@@ -77,6 +80,11 @@ def get_monthly_dict(queries, company, year):
             
             # If no URLs found, check for new headers or continue to the next month
             if urls_len == len(urls):  
+                all_ul = soup.find_all('ul')
+                if len(all_ul[1].find_all('li')) == 4:
+                    print(f'Done with {month} (moving to next month)')
+                    break
+                
                 if get_new_headers_or_continue(url):
                     headers, cookies = read_headers()
                     continue
@@ -91,18 +99,18 @@ def get_monthly_dict(queries, company, year):
         monthly_dict[month] = urls
 
         # Ensure the year directory exists
-        os.makedirs(f'./urls/{company}/{year}', exist_ok=True)
+        os.makedirs(f'./urls/{company}/{site_name}/{year}', exist_ok=True)
         # Save results for the month
-        with open(f'./urls/{company}/{year}/{month}_urls.txt', 'w') as file:
+        with open(f'./urls/{company}/{site_name}/{year}/{month}_urls.txt', 'w') as file:
             file.write(str(urls))
 
     return monthly_dict
 
 year = 2024
-site = 'finance.yahoo.com/news'
+site = 'www.ft.com'
 for company in SP_TOP:
     queries = get_queries(company, site, 2024)
-    monthly_dict = get_monthly_dict(queries, company, year)
+    monthly_dict = get_monthly_dict(queries, company, year, 'ft')
 
 # Close the WebDriver
 driver.quit()
